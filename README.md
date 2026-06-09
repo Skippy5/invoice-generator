@@ -78,5 +78,5 @@ vercel --prod
 
 ## Links
 
-- GitHub: pending repository creation
+- GitHub: https://github.com/Skippy5/invoice-generator
 - Live app: pending Vercel deployment
