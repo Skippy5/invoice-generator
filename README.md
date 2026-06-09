@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Spreadsheet to Word Invoice Generator
 
-## Getting Started
+A small client-only Next.js app that turns an Excel workbook into editable invoice previews and downloadable Word documents.
 
-First, run the development server:
+## What It Does
+
+- Upload an `.xlsx` workbook with invoice and line-item sheets.
+- See how many invoices were found.
+- Choose how many invoices to generate.
+- Edit invoice fields and line items in the browser.
+- Preview a clean printed invoice layout.
+- Download one invoice as `Invoice-<InvoiceNumber>.docx`.
+- Download multiple invoices as `Invoices.zip`.
+
+All parsing and document generation happens in the browser. There are no API routes, serverless functions, databases, or environment variables.
+
+## Spreadsheet Format
+
+Use the in-app **Download blank template** button as the source of truth. It creates a workbook with two sheets:
+
+### `Invoices`
+
+Required columns:
+
+`InvoiceNumber`, `InvoiceDate`, `BilledTo`, `PayToName`, `PayToAddress1`, `PayToAddress2`, `BankName`, `AccountName`, `BSB`, `AccountNumber`, `DiscountLabel`, `DiscountPercent`, `PaymentTermsDays`, `RemittanceEmail`
+
+Notes:
+
+- `InvoiceNumber` is required and links each invoice to its line items.
+- `DiscountPercent` may be `0`; when it is `0`, the discount row is omitted.
+- `PaymentTermsDays` is used in the footer sentence.
+- Dates are normalized for display where possible.
+
+### `LineItems`
+
+Required columns:
+
+`InvoiceNumber`, `Description`, `Rate`, `Hours`
+
+Notes:
+
+- `InvoiceNumber` must match a row in the `Invoices` sheet.
+- `Rate` and `Hours` are numeric and may use decimals.
+
+Calculations are computed by the app:
+
+- Line amount = `Rate * Hours`
+- Sub Total = sum of line amounts
+- Discount = `Sub Total * DiscountPercent / 100`
+- Total = `Sub Total - Discount`
+
+If a workbook is missing a required sheet or column, the app shows a friendly error and points the user back to the template.
+
+## Run Locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run build
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+This is a standard Next.js App Router project and can be imported into Vercel with default settings.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+vercel
+vercel --prod
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Links
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- GitHub: pending repository creation
+- Live app: pending Vercel deployment
